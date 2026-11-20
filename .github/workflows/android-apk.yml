@@ -1,0 +1,35 @@
+
+name: Build Android APK
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download project
+        uses: actions/checkout@v4
+
+      - name: Extract Unity project
+        run: unzip -o BlockAdventure3D_GitHub_ready.zip -d .
+
+      - name: Build APK
+        uses: game-ci/unity-builder@v4
+        env:
+          UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
+        with:
+          projectPath: BlockAdventure3D_GitHub
+          targetPlatform: Android
+          androidAppBundle: false
+          buildName: BlockAdventure3D
+
+      - name: Save APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: BlockAdventure3D-APK
+          path: build/Android/*.apk
+          if-no-files-found: error
